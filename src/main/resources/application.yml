@@ -17,3 +17,4 @@ knife4j:
   setting:
     language: zh_cn
 #    http://localhost:8123/api
+#http://localhost:8123/api/doc.html#/home
