@@ -1,6 +1,14 @@
 spring:
   application:
     name: gd-ai-0code-platform-backend
+#  musql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/gd-ai-0code-platform-backend?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 1234
+
+
 server:
   port: 8123
   servlet:
