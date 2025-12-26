@@ -62,6 +62,25 @@
             <artifactId>hutool-all</artifactId>
             <version>5.8.37</version>
         </dependency>
+
+        <!--mybatis-flex-->
+        <dependency>
+            <groupId>com.mybatis-flex</groupId>
+            <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+            <version>1.11.5</version>
+        </dependency>
+        <!--mybatis-flex 代码生成器-->
+        <dependency>
+            <groupId>com.mybatis-flex</groupId>
+            <artifactId>mybatis-flex-codegen</artifactId>
+            <version>1.11.5</version>
+        </dependency>
+        <!--hikariCP 数据库连接池-->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>
