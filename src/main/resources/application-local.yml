@@ -1,10 +1,10 @@
 spring:
   application:
-    name: gd-ai-0code-platform-backend
-#  musql
+    name: gd-ai-0code-platform
+# mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/gd-ai-0code-platform-backend?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/gd_ai_0code_platform?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&zeroDateTimeBehavior=convertToNull
     username: root
     password: 1234
 
