@@ -1,6 +1,12 @@
 package com.company.controller;
 
+import com.company.common.BaseResponse;
+import com.company.common.ResultUtils;
+import com.company.exception.ErrorCode;
+import com.company.exception.ThrowUtils;
+import com.company.model.dto.UserRegisterRequest;
 import com.mybatisflex.core.paginate.Page;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +29,31 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
+    @Resource
     private UserService userService;
+
+    /**
+     * 用户注册
+     *
+     * @param userRegisterRequest 用户注册请求
+     * @return 创建的用户id
+     */
+    @PostMapping("register")
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        ThrowUtils.throwIf(userRegisterRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
+        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 用户登录
+     */
+    public BaseResponse
+
 
     /**
      * 保存用户。
