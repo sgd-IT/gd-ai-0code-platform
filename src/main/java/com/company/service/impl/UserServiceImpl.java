@@ -1,11 +1,13 @@
 package com.company.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.company.exception.BusinessException;
 import com.company.exception.ErrorCode;
 import com.company.model.enums.UserRoleEnum;
 import com.company.model.vo.LoginUserVO;
+import com.company.model.vo.UserVO;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.company.model.entity.User;
@@ -15,6 +17,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.kafka.SslBundleSslEngineFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.company.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -153,6 +159,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return true;
+    }
+
+    /**
+     * 获取脱敏后的用户信息
+     * @param user
+     * @return
+     */
+    @Override
+    public UserVO getUserVO(User user) {
+        if(user==null){
+            return null;
+        }
+        UserVO userVO = new UserVO();
+        BeanUtil.copyProperties(user,userVO);
+        return userVO;
+    }
+
+    /**
+     * 获取脱敏后用户列表
+     * @param userList
+     * @return
+     */
+    @Override
+    public List<UserVO> getListUserVO(List<User> userList) {
+        if(CollUtil.isEmpty(userList)){
+            return new ArrayList<>();
+        }
+        return userList.stream()
+                .map(this::getUserVO)
+                .collect(Collectors.toList());
     }
 
 
