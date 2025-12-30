@@ -1,9 +1,13 @@
 package com.company.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.company.annotation.AuthCheck;
 import com.company.common.BaseResponse;
 import com.company.common.ResultUtils;
+import com.company.constant.UserConstant;
 import com.company.exception.ErrorCode;
 import com.company.exception.ThrowUtils;
+import com.company.model.dto.UserAddRequest;
 import com.company.model.dto.UserLoginRequest;
 import com.company.model.dto.UserRegisterRequest;
 import com.company.model.vo.LoginUserVO;
@@ -82,6 +86,26 @@ public class UserController {
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         ThrowUtils.throwIf(request==null, ErrorCode.OPERATION_ERROR, "未登录");
         return ResultUtils.success(userService.userLogout(request));
+    }
+
+
+    /**
+     * 添加用户。
+     *
+     * @param userAddRequest 用户
+     * @return 添加的用户
+     */
+    @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<User> addUser(@RequestBody UserAddRequest userAddRequest) {
+        ThrowUtils.throwIf(userAddRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        User user = new User();
+        BeanUtil.copyProperties(userAddRequest, user);
+        String encryptPassword = userService.getEncryptPassword(UserConstant.DEFAULT_PASSWORD);
+        user.setUserPassword(encryptPassword);
+        boolean result = userService.save(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "用户添加失败");
+        return ResultUtils.success(user);
     }
 
 
