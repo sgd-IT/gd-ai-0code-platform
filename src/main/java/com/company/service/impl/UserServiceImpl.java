@@ -1,5 +1,6 @@
 package com.company.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.company.exception.BusinessException;
 import com.company.exception.ErrorCode;
@@ -10,9 +11,12 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.company.model.entity.User;
 import com.company.mapper.UserMapper;
 import com.company.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.kafka.SslBundleSslEngineFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import static com.company.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户 服务层实现。
@@ -69,16 +73,88 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 用户登录
+     * 获取脱敏后的用户信息
      *
-     * @param userAccount   账号
-     * @param password      密码
+     * @param user
      * @return
      */
     @Override
-    public LoginUserVO userLogin(String userAccount, String password) {
-        return null;
+    public LoginUserVO getUserLoginVO(User  user) {
+        //校验
+        if(user==null){
+            return null;
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        BeanUtil.copyProperties(user,loginUserVO);
+        return loginUserVO;
     }
+
+    /**
+     * 用户登录
+     *
+     * @param userAccount
+     * @param password
+     * @return 脱敏后的用户信息
+     */
+    public LoginUserVO userLogin(String userAccount, String password, HttpServletRequest request) {
+        //校验
+        if (StrUtil.hasBlank(userAccount, password)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        if (userAccount.length() < 4) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
+        }
+        if (password.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
+        }
+        //查看用户是否存在
+        String encryptPassword = getEncryptPassword(password);
+
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("userAccount", userAccount);
+        queryWrapper.eq("password",encryptPassword);
+        User user = this.mapper.selectOneByQuery(queryWrapper);
+        if(user==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+        //记录用户状态到session
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        //返回脱敏后的用户信息
+        return this.getUserLoginVO(user);
+    }
+
+    /**
+     * 获取当前登录用户
+     * @param request
+     * @return
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) attribute;
+        if(currentUser ==null || currentUser.getId()==null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR,"未登录");
+        }
+        Long id = currentUser.getId();
+        currentUser = this.getById(id);
+        if(currentUser==null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR,"用户不存在");
+        }
+
+        return currentUser;
+    }
+
+    /**
+     * 用户登出
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return true;
+    }
+
 
     /**
  * 获取加密密码

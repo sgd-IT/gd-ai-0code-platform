@@ -4,9 +4,12 @@ import com.company.common.BaseResponse;
 import com.company.common.ResultUtils;
 import com.company.exception.ErrorCode;
 import com.company.exception.ThrowUtils;
+import com.company.model.dto.UserLoginRequest;
 import com.company.model.dto.UserRegisterRequest;
+import com.company.model.vo.LoginUserVO;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +41,7 @@ public class UserController {
      * @param userRegisterRequest 用户注册请求
      * @return 创建的用户id
      */
-    @PostMapping("register")
+    @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         ThrowUtils.throwIf(userRegisterRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
         String userAccount = userRegisterRequest.getUserAccount();
@@ -52,7 +55,35 @@ public class UserController {
     /**
      * 用户登录
      */
-    public BaseResponse
+    @PostMapping("/login")
+    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(userLoginRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+        return ResultUtils.success(loginUserVO);
+    }
+
+    /**
+     * 获取当前登录用户
+     * @param request
+     * @return
+     */
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getUserLoginVO(user));
+    }
+
+    /**
+     * 用户注销
+     */
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        ThrowUtils.throwIf(request==null, ErrorCode.OPERATION_ERROR, "未登录");
+        return ResultUtils.success(userService.userLogout(request));
+    }
+
 
 
     /**
