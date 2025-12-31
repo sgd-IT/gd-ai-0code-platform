@@ -1,7 +1,9 @@
 package com.company.service;
 
+import com.company.model.dto.UserQueryRequest;
 import com.company.model.vo.LoginUserVO;
 import com.company.model.vo.UserVO;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
 import com.company.model.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,10 +38,10 @@ public interface UserService extends IService<User> {
      * 用户登录
      *
      * @param userAccount
-     * @param password
+     * @param userPassword
      * @return 脱敏后的用户信息
      */
-    LoginUserVO userLogin(String userAccount, String password,HttpServletRequest request);
+    LoginUserVO userLogin(String userAccount, String userPassword,HttpServletRequest request);
 
     /**
      * 获取当前登录用户
@@ -61,6 +63,12 @@ public interface UserService extends IService<User> {
      * 获取脱敏后的用户列表
      */
     List<UserVO> getListUserVO(List<User> userList);
+
+
+    /**
+     * 将查询请求转为QueryWrapper对象
+     */
+    QueryWrapper getQueryWrapper(UserQueryRequest userQueryRequest);
 
     /**
      * 加密
