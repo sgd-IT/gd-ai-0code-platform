@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.company.exception.BusinessException;
 import com.company.exception.ErrorCode;
+import com.company.model.dto.UserQueryRequest;
 import com.company.model.enums.UserRoleEnum;
 import com.company.model.vo.LoginUserVO;
 import com.company.model.vo.UserVO;
@@ -99,26 +100,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 用户登录
      *
      * @param userAccount
-     * @param password
+     * @param userPassword
      * @return 脱敏后的用户信息
      */
-    public LoginUserVO userLogin(String userAccount, String password, HttpServletRequest request) {
+    public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         //校验
-        if (StrUtil.hasBlank(userAccount, password)) {
+        if (StrUtil.hasBlank(userAccount, userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
         }
-        if (password.length() < 8) {
+        if (userPassword.length() < 8) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
         }
         //查看用户是否存在
-        String encryptPassword = getEncryptPassword(password);
+        String encryptPassword = getEncryptPassword(userPassword);
 
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("password",encryptPassword);
+        queryWrapper.eq("userPassword",encryptPassword);
         User user = this.mapper.selectOneByQuery(queryWrapper);
         if(user==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
@@ -189,6 +190,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userList.stream()
                 .map(this::getUserVO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取查询条件
+     * @param userQueryRequest
+     * @return
+     */
+    @Override
+    public QueryWrapper getQueryWrapper(UserQueryRequest userQueryRequest) {
+        if (userQueryRequest == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        Long id = userQueryRequest.getId();
+        String userName = userQueryRequest.getUserName();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userProfile = userQueryRequest.getUserProfile();
+        String userRole = userQueryRequest.getUserRole();
+        String sortField = userQueryRequest.getSortField();
+        String sortOrder = userQueryRequest.getSortOrder();
+        return QueryWrapper.create()
+                .eq("id",id)
+                .like("userName",userName)
+                .like("userAccount",userAccount)
+                .like("userProfile",userProfile)
+                .eq("userRole",userRole)
+                .orderBy(sortField,"ascend".equals(sortOrder));
     }
 
 

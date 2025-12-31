@@ -7,10 +7,9 @@ import com.company.common.ResultUtils;
 import com.company.constant.UserConstant;
 import com.company.exception.ErrorCode;
 import com.company.exception.ThrowUtils;
-import com.company.model.dto.UserAddRequest;
-import com.company.model.dto.UserLoginRequest;
-import com.company.model.dto.UserRegisterRequest;
+import com.company.model.dto.*;
 import com.company.model.vo.LoginUserVO;
+import com.company.model.vo.UserVO;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -108,71 +107,74 @@ public class UserController {
         return ResultUtils.success(user);
     }
 
-
-
     /**
-     * 保存用户。
-     *
-     * @param user 用户
-     * @return {@code true} 保存成功，{@code false} 保存失败
+     * 根据id获取用户（管理员）
+     * @param id
+     * @return
      */
-    @PostMapping("save")
-    public boolean save(@RequestBody User user) {
-        return userService.save(user);
+    @GetMapping("/get/{id}")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<User> getUserById(@PathVariable Long id) {
+        ThrowUtils.throwIf(id==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        User user = userService.getById(id);
+        ThrowUtils.throwIf(user==null, ErrorCode.OPERATION_ERROR, "用户不存在");
+        return ResultUtils.success(user);
     }
 
     /**
-     * 根据主键删除用户。
-     *
-     * @param id 主键
-     * @return {@code true} 删除成功，{@code false} 删除失败
+     * 根据id获取包装类
      */
-    @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Long id) {
-        return userService.removeById(id);
+    @GetMapping("/get/vo/{id}")
+    public BaseResponse<UserVO> getUserVOById(@PathVariable Long id) {
+        ThrowUtils.throwIf(id==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        BaseResponse<User> response=getUserById(id);
+        User user = response.getData();
+        return ResultUtils.success(userService.getUserVO(user));
     }
 
     /**
-     * 根据主键更新用户。
-     *
-     * @param user 用户
-     * @return {@code true} 更新成功，{@code false} 更新失败
+     * 根据id删除用户
      */
-    @PutMapping("update")
-    public boolean update(@RequestBody User user) {
-        return userService.updateById(user);
+    @DeleteMapping("/delete/{id}")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> deleteUser(@PathVariable Long id) {
+        ThrowUtils.throwIf(id==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        User user = userService.getById(id);
+        ThrowUtils.throwIf(user==null, ErrorCode.NOT_FOUND_ERROR, "用户不存在");
+        boolean result = userService.removeById(id);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "用户删除失败");
+        return ResultUtils.success(true);
     }
 
     /**
-     * 查询所有用户。
-     *
-     * @return 所有数据
+     * 更新用户
      */
-    @GetMapping("list")
-    public List<User> list() {
-        return userService.list();
+    @PutMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+        ThrowUtils.throwIf(userUpdateRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        User user = new User();
+        BeanUtil.copyProperties(userUpdateRequest, user);
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "用户更新失败");
+        return ResultUtils.success(true);
     }
 
     /**
-     * 根据主键获取用户。
-     *
-     * @param id 用户主键
-     * @return 用户详情
+     * 分页获取用户列表（脱敏信息）
      */
-    @GetMapping("getInfo/{id}")
-    public User getInfo(@PathVariable Long id) {
-        return userService.getById(id);
+    @GetMapping("/list/page/vo")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<UserVO>> listUserVOByPage(UserQueryRequest userQueryRequest) {
+        ThrowUtils.throwIf(userQueryRequest==null, ErrorCode.PARAMS_ERROR, "参数为空");
+        long pageNum=userQueryRequest.getPageNum();
+        long pageSize=userQueryRequest.getPageSize();
+        Page<User> page=userService.page(Page.of(pageNum, pageSize),userService.getQueryWrapper(userQueryRequest));
+        //数据脱敏
+        ThrowUtils.throwIf(page==null, ErrorCode.OPERATION_ERROR, "用户列表获取失败");
+        Page<UserVO> userVOPage=new Page<>(pageNum, pageSize, page.getTotalRow());
+        List<UserVO> userVOList = userService.getListUserVO(page.getRecords());
+        userVOPage.setRecords(userVOList);
+        return ResultUtils.success(userVOPage);
     }
-
-    /**
-     * 分页查询用户。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<User> page(Page<User> page) {
-        return userService.page(page);
-    }
-
 }
