@@ -22,7 +22,15 @@
       <!-- 右侧：用户操作区域 -->
       <a-col>
         <div class="user-login-status">
-          <a-button type="primary">登录</a-button>
+          <div v-if="loginUserStore.loginUser.id">
+            <a-spece>
+              <a-avatar :src="loginUserStore.loginUser.userAvatar" />
+              {{ loginUserStore.loginUser.userName ?? '无名' }}
+            </a-spece>
+          </div>
+          <div v-else>
+            <a-button type="primary" href="/user/login">登录</a-button>
+          </div>
         </div>
       </a-col>
     </a-row>
@@ -33,6 +41,10 @@
 import { h, ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import type { MenuProps } from 'ant-design-vue'
+import { useLoginUserStore } from '@/stores/loginUser.ts'
+
+//获取当前登录用户状态
+const loginUserStore = useLoginUserStore()
 
 const router = useRouter()
 
@@ -101,4 +113,3 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
   border-bottom: none !important;
 }
 </style>
-
