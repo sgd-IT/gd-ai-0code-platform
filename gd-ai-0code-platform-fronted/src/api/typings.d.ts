@@ -53,9 +53,7 @@ declare namespace API {
     id: number
   }
 
-  type listUserVOByPageParams = {
-    userQueryRequest: UserQueryRequest
-  }
+  type listUserVOByPageParams = UserQueryRequest
 
   type LoginUserVO = {
     id?: number
