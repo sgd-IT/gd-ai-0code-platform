@@ -1,9 +1,10 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getLoginUser } from '@/api/userController.ts'
 
 /**
  * 登录用户信息
+ * 定义登录用户的存储/远程获取，修改逻辑
  */
 export const useLoginUserStore = defineStore('loginUser', () => {
   //默认值

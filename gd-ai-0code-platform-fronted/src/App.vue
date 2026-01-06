@@ -8,7 +8,6 @@ testOk({ name: 'test' }).then((res) => {
 })
  const loginUserStore = useLoginUserStore()
 loginUserStore.fetchLoginUser()
-
 </script>
 
 <template>
