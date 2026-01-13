@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class AiCodeGeneratorFacadeTest {
@@ -17,7 +16,7 @@ class AiCodeGeneratorFacadeTest {
 
     @Test
     void generateAndSaveCode() {
-        File file = aiCodeGeneratorFacade.generateAndSaveCode("做一个自我介绍页面，20行", CodenGenTypeEnum.HTML);
+        File file = aiCodeGeneratorFacade.generateAndSaveCode("做一个自我介绍页面，20行", CodenGenTypeEnum.MULTI_FILE);
         Assertions.assertNotNull( file);
     }
 }
