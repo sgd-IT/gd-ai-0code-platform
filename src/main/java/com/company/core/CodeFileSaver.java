@@ -1,6 +1,8 @@
 package com.company.core;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.company.ai.model.HtmlCodeResult;
 import com.company.ai.model.MultiFileCodeResult;
 import com.company.ai.model.enums.CodenGenTypeEnum;
@@ -35,7 +37,8 @@ public class CodeFileSaver {
     //构建唯一目录路径
     private static String buildUniqueDirPath(String type) {
         //File.sparator== \(斜杆)
-        String baseDirPath = FILE_PATH + File.separator + type;
+        String uniquePath = StrUtil.format("{} {}", type, IdUtil.getSnowflakeNextIdStr());
+        String baseDirPath = FILE_PATH + File.separator + uniquePath;
         File baseDir = new File(baseDirPath);
         if (!baseDir.exists()) {
             //创建目录 mkdirs递归创建「多级嵌套文件夹」，哪怕父文件夹不存在，也会自动创建所有层级。
