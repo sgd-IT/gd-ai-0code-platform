@@ -5,7 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.company.ai.model.HtmlCodeResult;
 import com.company.ai.model.MultiFileCodeResult;
-import com.company.ai.model.enums.CodenGenTypeEnum;
+import com.company.ai.model.enums.CodeGenTypeEnum;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * 代码文件保存器
  */
+@Deprecated
 public class CodeFileSaver {
 
     //文件保存到根目录
@@ -21,14 +22,14 @@ public class CodeFileSaver {
 
     //保存HtmlCodeResult
     public static File saveHtmlCodeResult(HtmlCodeResult htmlCodeResult) {
-        String baseDirPath = buildUniqueDirPath(CodenGenTypeEnum.HTML.getValue());
+        String baseDirPath = buildUniqueDirPath(CodeGenTypeEnum.HTML.getValue());
         saveSingleFile(baseDirPath, "index.html", htmlCodeResult.getHtmlCode());
         return new File(baseDirPath);
     }
 
     //保存MultiFileCodeResult
     public static File saveMultiFileCodeResult(MultiFileCodeResult multiFileCodeResult) {
-        String baseDirPath = buildUniqueDirPath(CodenGenTypeEnum.MULTI_FILE.getValue());
+        String baseDirPath = buildUniqueDirPath(CodeGenTypeEnum.MULTI_FILE.getValue());
         saveSingleFile(baseDirPath, "index.html", multiFileCodeResult.getHtmlCode());
         saveSingleFile(baseDirPath, "style.css", multiFileCodeResult.getCssCode());
         saveSingleFile(baseDirPath, "script.js", multiFileCodeResult.getJsCode());

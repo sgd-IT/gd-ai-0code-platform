@@ -5,14 +5,14 @@ import cn.hutool.core.util.ObjUtil;
 import lombok.Getter;
 
 @Getter
-public enum CodenGenTypeEnum {
+public enum CodeGenTypeEnum {
     HTML("原生HTML模式","html"),
     MULTI_FILE("多文件模式","multiFile");
 
     private final String text;
     private final String value;
 
-    CodenGenTypeEnum(String text,String value){
+    CodeGenTypeEnum(String text, String value){
         this.text = text;
         this.value = value;
     }
@@ -22,13 +22,13 @@ public enum CodenGenTypeEnum {
      * @param value
      * @return
      */
-    public static CodenGenTypeEnum getEnumByValue(String value){
+    public static CodeGenTypeEnum getEnumByValue(String value){
         if(ObjUtil.isEmpty(value)){
             return null;
         }
-        for(CodenGenTypeEnum codenGenTypeEnum:CodenGenTypeEnum.values()){
-            if (codenGenTypeEnum.value.equals(value)){
-                return codenGenTypeEnum;
+        for(CodeGenTypeEnum codeGenTypeEnum : CodeGenTypeEnum.values()){
+            if (codeGenTypeEnum.value.equals(value)){
+                return codeGenTypeEnum;
             }
         }
         return null;
