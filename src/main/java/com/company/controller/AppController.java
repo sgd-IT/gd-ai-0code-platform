@@ -3,6 +3,7 @@ package com.company.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.company.annotation.AuthCheck;
 import com.company.common.BaseResponse;
+import com.company.common.DeleteRequest;
 import com.company.common.ResultUtils;
 import com.company.constant.UserConstant;
 import com.company.exception.ErrorCode;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -78,7 +80,7 @@ public class AppController {
     }
 
     /**
-     * 【用户】根据 id 修改自己的应用（目前只支持修改应用名称）
+     * 【用户】根据 id 修改自己的应用
      *
      * @param appUpdateRequest 更新应用请求
      * @param request          HTTP请求
@@ -103,6 +105,7 @@ public class AppController {
         App app = new App();
         app.setId(id);
         app.setAppName(appUpdateRequest.getAppName());
+        app.setEditTime(LocalDateTime.now());
 
         // 校验数据
         appService.validApp(app, false);
@@ -115,14 +118,16 @@ public class AppController {
     }
 
     /**
-     * 【用户】根据 id 删除自己的应用
-     *
-     * @param id      应用id
-     * @param request HTTP请求
-     * @return 是否成功
+     * 【用户】删除应用
+     * @param deleteRequest
+     * @param request
+     * @return
      */
-    @DeleteMapping("/delete/{id}")
-    public BaseResponse<Boolean> deleteApp(@PathVariable Long id, HttpServletRequest request) {
+    @DeleteMapping("/delete")
+    public BaseResponse<Boolean> deleteApp(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        //获取应用id
+        Long id = deleteRequest.getId();
+
         ThrowUtils.throwIf(id == null, ErrorCode.PARAMS_ERROR, "参数为空");
 
         // 获取当前登录用户
@@ -143,25 +148,17 @@ public class AppController {
     }
 
     /**
-     * 【用户】根据 id 查看应用详情
-     *
-     * @param id      应用id
-     * @param request HTTP请求
-     * @return 应用详情
+     * 【用户】根据 id 获取应用
+     * @param id
+     * @return
      */
-    @GetMapping("/get/vo/{id}")
-    public BaseResponse<AppVO> getAppVOById(@PathVariable Long id, HttpServletRequest request) {
+    @GetMapping("/get/vo")
+    public BaseResponse<AppVO> getAppVOById(@PathVariable Long id) {
         ThrowUtils.throwIf(id == null, ErrorCode.PARAMS_ERROR, "参数为空");
-
-        // 获取当前登录用户
-        User loginUser = userService.getLoginUser(request);
 
         // 获取应用
         App app = appService.getById(id);
         ThrowUtils.throwIf(app == null, ErrorCode.NOT_FOUND_ERROR, "应用不存在");
-
-        // 校验是否是自己的应用
-        ThrowUtils.throwIf(!app.getUserId().equals(loginUser.getId()), ErrorCode.NO_AUTH_ERROR, "无权限查看此应用");
 
         return ResultUtils.success(appService.getAppVO(app));
     }

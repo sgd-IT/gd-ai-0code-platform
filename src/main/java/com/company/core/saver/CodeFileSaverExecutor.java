@@ -18,10 +18,10 @@ public class CodeFileSaverExecutor {
     private static final MutilFileSaverTemplate mutilFileSaverTemplate = new MutilFileSaverTemplate();
 
     //执行代码保存方法
-    public static File executeSaver(CodeGenTypeEnum codeType, Object codeResult) {
+    public static File executeSaver(CodeGenTypeEnum codeType, Object codeResult, Long appId) {
         return switch (codeType){
-            case HTML -> htmlCodeFileSaverTemplate.saveCode((HtmlCodeResult) codeResult);
-            case MULTI_FILE -> mutilFileSaverTemplate.saveCode((MultiFileCodeResult) codeResult);
+            case HTML -> htmlCodeFileSaverTemplate.saveCode((HtmlCodeResult) codeResult, appId);
+            case MULTI_FILE -> mutilFileSaverTemplate.saveCode((MultiFileCodeResult) codeResult, appId);
             default -> throw new BusinessException(ErrorCode.SYSTEM_ERROR, "不支持的生成类型" + codeType.getValue());
         };
     }

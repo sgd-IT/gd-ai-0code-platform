@@ -3,8 +3,11 @@ package com.company.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.company.ai.model.enums.CodeGenTypeEnum;
+import com.company.core.AiCodeGeneratorFacade;
 import com.company.exception.BusinessException;
 import com.company.exception.ErrorCode;
+import com.company.exception.ThrowUtils;
 import com.company.mapper.AppMapper;
 import com.company.model.dto.AppAdminQueryRequest;
 import com.company.model.dto.AppQueryRequest;
@@ -16,8 +19,10 @@ import com.company.service.AppService;
 import com.company.service.UserService;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import dev.langchain4j.agent.tool.P;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,35 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
     @Resource
     private UserService userService;
+    @Resource
+    private AiCodeGeneratorFacade aiCodeGeneratorFacade;
+
+    /**
+     * 应用聊天生成代码（流式SSE）
+     * @param message
+     * @param appId
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public Flux<String> chatToGenCode(String message, Long appId, User loginUser) {
+        //校验参数
+        ThrowUtils.throwIf(appId==null || appId <= 0,ErrorCode.PARAMS_ERROR,"应用ID不能为空");
+        ThrowUtils.throwIf(StrUtil.isBlank( message),ErrorCode.PARAMS_ERROR,"用户消息不能为空");
+        //查询应用信息
+        App app = new App();
+        app = this.getById(appId);
+        ThrowUtils.throwIf(app == null, ErrorCode.NOT_FOUND_ERROR, "应用不存在");
+        //验证用户权限
+        if (!app.getUserId().equals(loginUser.getId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限访问");
+        }
+        //获取生成代码类型
+        String codeGenType = app.getCodeGenType();
+        CodeGenTypeEnum codeGenTypeEnum = CodeGenTypeEnum.getEnumByValue(codeGenType);
+        //调用生成代码接口
+        return aiCodeGeneratorFacade.generateAndSaveCodeStream(message, codeGenTypeEnum, appId);
+    }
 
     /**
      * 校验应用数据

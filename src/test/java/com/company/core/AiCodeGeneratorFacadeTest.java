@@ -16,15 +16,17 @@ class AiCodeGeneratorFacadeTest {
     @Resource
     private AiCodeGeneratorFacade aiCodeGeneratorFacade;
 
+    private static final Long appId = 1L;
+
     @Test
     void generateAndSaveCode() throws Exception {
-        File file = aiCodeGeneratorFacade.generateAndSaveCode("做一个自我介绍页面，20行", CodeGenTypeEnum.MULTI_FILE);
+        File file = aiCodeGeneratorFacade.generateAndSaveCode("做一个自我介绍页面，20行", CodeGenTypeEnum.MULTI_FILE,appId);
         Assertions.assertNotNull( file);
     }
 
     @Test
     void generateAndSaveCodeStream() {
-        Flux<String>  htmlcode= aiCodeGeneratorFacade.generateAndSaveCodeStream("做一个自我介绍页面，20行", CodeGenTypeEnum.HTML);
+        Flux<String>  htmlcode= aiCodeGeneratorFacade.generateAndSaveCodeStream("做一个自我介绍页面，20行", CodeGenTypeEnum.HTML, appId);
         List<String> block = htmlcode.collectList().block();
 
         Assertions.assertNotNull(block);

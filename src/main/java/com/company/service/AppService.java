@@ -3,9 +3,11 @@ package com.company.service;
 import com.company.model.dto.AppAdminQueryRequest;
 import com.company.model.dto.AppQueryRequest;
 import com.company.model.entity.App;
+import com.company.model.entity.User;
 import com.company.model.vo.AppVO;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -15,6 +17,16 @@ import java.util.List;
  * @author gd
  */
 public interface AppService extends IService<App> {
+
+    /**
+     * 应用聊天生成代码（流式SSE）
+     * @param message
+     * @param appId
+     * @param loginUser
+     * @return
+     */
+    Flux<String> chatToGenCode(String message, Long appId, User loginUser);
+
 
     /**
      * 校验应用数据（创建时）
