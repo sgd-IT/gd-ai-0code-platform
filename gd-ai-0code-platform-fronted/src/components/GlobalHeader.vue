@@ -97,6 +97,11 @@ const originItems = [
     title: '用户管理',
   },
   {
+    key: '/admin/appManage',
+    label: '应用管理',
+    title: '应用管理',
+  },
+  {
     key: 'others',
     label: h('a', { href: 'https://www.codefather.cn', target: '_blank' }, '编程导航'),
     title: '编程导航',
@@ -136,8 +141,10 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
 
 <style scoped>
 .header {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .header-left {
@@ -154,10 +161,21 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
 .site-title {
   margin: 0;
   font-size: 18px;
-  color: #1890ff;
+  color: #1a1a2e;
+  font-weight: 600;
 }
 
 .ant-menu-horizontal {
   border-bottom: none !important;
+  background: transparent !important;
+}
+
+:deep(.ant-menu-light) {
+  background: transparent;
+}
+
+.user-login-status {
+  display: flex;
+  align-items: center;
 }
 </style>

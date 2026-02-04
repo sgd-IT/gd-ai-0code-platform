@@ -17,14 +17,6 @@
   </div>
 
   <a-table :columns="columns" :data-source="data" :pagination="pagination" @change="doTableChange">
-    <template #headerCell="{ column }">
-      <template v-if="column.key === 'name'">
-        <span>
-          <smile-outlined />
-          Name
-        </span>
-      </template>
-    </template>
 
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'userAvatar'">
@@ -39,7 +31,7 @@
         </div>
       </template>
       <template v-else-if="column.dataIndex === 'createTime'">
-        {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        {{ formatDateTime(record.createTime) }}
       </template>
       <template v-else-if="column.key === 'action'">
         <a-button danger @click="doDelete(record.id)">删除</a-button>
@@ -48,11 +40,10 @@
   </a-table>
 </template>
 <script lang="ts" setup>
-import { SmileOutlined } from '@ant-design/icons-vue'
-import dayjs from 'dayjs'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { deleteUser, listUserVoByPage } from '@/api/userController.ts'
+import { deleteUser, listUserVoByPage } from '@/api/userController'
+import { formatDateTime } from '@/utils/format'
 const columns = [
   {
     title: 'id',

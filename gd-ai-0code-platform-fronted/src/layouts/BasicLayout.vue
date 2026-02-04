@@ -20,13 +20,15 @@ import GlobalFooter from '@/components/GlobalFooter.vue'
 
 <style scoped>
 .basic-layout {
-  background: none;
+  min-height: 100vh;
+  background: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
+  background-attachment: fixed;
 }
 
 .main-content {
   max-width: 1200px;
   padding: 24px;
-  background: white;
+  background: transparent;
   margin: 16px auto 56px;
 }
 </style>

@@ -21,9 +21,10 @@
 
 <style scoped>
 .footer {
-  background: #efefef;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
   text-align: center;
-  padding: 20px;
+  padding: 16px 20px;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -32,8 +33,17 @@
 
 .copyright {
   margin: 0;
-  color: #666;
-  font-size: 14px;
+  color: #4a5568;
+  font-size: 13px;
+}
+
+.author-link {
+  color: #4a5568;
+  transition: color 0.3s;
+}
+
+.author-link:hover {
+  color: #667eea;
 }
 </style>
 

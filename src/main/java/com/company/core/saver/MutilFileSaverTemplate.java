@@ -11,10 +11,18 @@ public class MutilFileSaverTemplate extends CodeFileSaverTemplate<MultiFileCodeR
     protected void saveFiles(String uniquePath, MultiFileCodeResult codeResult) {
         //保存html文件
         writeToFile(uniquePath, "index.html", codeResult.getHtmlCode());
-        //保存css文件
-        writeToFile(uniquePath, "style.css", codeResult.getCssCode());
-        //保存js文件
-        writeToFile(uniquePath, "script.js", codeResult.getJsCode());
+        //保存css文件（如果为空则创建默认文件）
+        String cssCode = codeResult.getCssCode();
+        if (StrUtil.isBlank(cssCode)) {
+            cssCode = "/* 样式文件 */\n";
+        }
+        writeToFile(uniquePath, "style.css", cssCode);
+        //保存js文件（如果为空则创建默认文件）
+        String jsCode = codeResult.getJsCode();
+        if (StrUtil.isBlank(jsCode)) {
+            jsCode = "// JavaScript 代码文件\n";
+        }
+        writeToFile(uniquePath, "script.js", jsCode);
     }
 
     @Override
@@ -24,8 +32,8 @@ public class MutilFileSaverTemplate extends CodeFileSaverTemplate<MultiFileCodeR
 
     protected void validateInput(MultiFileCodeResult codeResult) {
         super.validateInput(codeResult);
-        if (StrUtil.isNotBlank(codeResult.getHtmlCode())) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, " HTML代码内容为空");
+        if (StrUtil.isBlank(codeResult.getHtmlCode())) {  // 为空时才抛异常
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "HTML代码内容为空");
         }
     }
 }
